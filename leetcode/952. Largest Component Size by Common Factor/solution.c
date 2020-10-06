@@ -177,7 +177,7 @@ int largestComponentSizeNN(int* A, int n) {
   return ret;
 }
 
-int largestComponentSize(int* A, int n) {
+int largestComponentSizeSieve(int* A, int n) {
 
   int tag[100001];
   int maxn = 0;
@@ -248,6 +248,53 @@ int largestComponentSize(int* A, int n) {
   //   adjacency[i].next = NULL;
   // }
 
+  return ret;
+}
+
+int find(int* parent, int x) {
+  if (parent[x] == -1) {
+    return x;
+  }
+  return parent[x] = find(parent, parent[x]);
+}
+
+void uni(int* parent, int a, int b) {
+  int pa = find(parent, a);
+  int pb = find(parent, b);
+  if (pa != pb) {
+    parent[pa] = pb;
+  }
+}
+
+int max(int a, int b) {
+  if (a > b) {
+    return a;
+  }
+  return b;
+}
+
+int largestComponentSize(int* A, int n) {
+  int parent[100001] = {0};
+  memset(parent, -1, sizeof(parent));
+  for (int i = 0; i < n; ++i) {
+    for (int j = 2; j * j <= A[i]; ++j) {
+      if (A[i] % j == 0) {
+        uni(parent, A[i], A[i] / j);
+        uni(parent, A[i], j);
+      }
+    }
+  }
+  int cnt[100001] = {0};
+  int ret = 0;
+  for (int i = 0; i < n; ++i) {
+    ret = max(++cnt[find(parent, A[i])], ret);
+  }
+  for (int i = 0; i < n; ++i) {
+    printf("%2d%c", A[i], i == n - 1 ? '\n' : ' ');
+  }
+  for (int i = 0; i < n; ++i) {
+    printf("%2d%c", find(parent, A[i]), i == n - 1 ? '\n' : ' ');
+  }
   return ret;
 }
 
